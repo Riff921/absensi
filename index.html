@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAttend - Sistem Absensi Guru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="glass-effect rounded-2xl p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">🎓</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">EduAttend</h1>
+                        <p class="text-blue-100">Sistem Absensi Guru Terpadu</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-white font-semibold" id="currentTime"></div>
+                    <div class="text-blue-100 text-sm" id="currentDate"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Panel Absensi Utama -->
+            <div class="lg:col-span-2">
+                <div class="glass-effect rounded-2xl p-6 mb-6">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center">
+                        <span class="mr-3">📋</span>
+                        Panel Absensi
+                    </h2>
+                    
+                    <!-- Status Keamanan -->
+                    <div class="bg-green-500/20 border border-green-400/30 rounded-xl p-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="location-indicator"></div>
+                                <div>
+                                    <div class="text-green-100 font-semibold">Status Keamanan: Aktif</div>
+                                    <div class="text-green-200 text-sm">Lokasi terverifikasi • IP tracking aktif</div>
+                                </div>
+                            </div>
+                            <div class="text-green-100 text-sm">
+                                <div>Lat: <span id="latitude">-</span></div>
+                                <div>Lng: <span id="longitude">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Absensi -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-white font-medium mb-2">NIP/ID Guru</label>
+                            <input type="text" id="teacherId" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Masukkan NIP Anda">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white font-medium mb-2">Nama Lengkap</label>
+                            <input type="text" id="teacherName" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama sesuai data kepegawaian">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white font-medium mb-2">Jenis Absensi</label>
+                            <select id="attendanceType" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                <option value="">Pilih jenis absensi</option>
+                                <option value="masuk">Absen Masuk</option>
+                                <option value="keluar">Absen Keluar</option>
+                                <option value="istirahat">Istirahat</option>
+                                <option value="kembali">Kembali dari Istirahat</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white font-medium mb-2">Keterangan (Opsional)</label>
+                            <textarea id="notes" rows="3" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Tambahkan keterangan jika diperlukan"></textarea>
+                        </div>
+                        
+                        <!-- Tombol Absensi -->
+                        <div class="flex space-x-4 pt-4">
+                            <button onclick="submitAttendance()" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center justify-center space-x-2">
+                                <span>✓</span>
+                                <span>Submit Absensi</span>
+                            </button>
+                            <button onclick="capturePhoto()" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center">
+                                <span>📸</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riwayat Absensi Hari Ini -->
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <span class="mr-3">📊</span>
+                        Riwayat Hari Ini
+                    </h3>
+                    <div id="todayHistory" class="space-y-3">
+                        <!-- Akan diisi dengan JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Samping -->
+            <div class="space-y-6">
+                <!-- Statistik -->
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <span class="mr-3">📈</span>
+                        Statistik Bulan Ini
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Hadir</span>
+                            <span class="text-white font-bold" id="presentDays">22 hari</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Terlambat</span>
+                            <span class="text-yellow-300 font-bold" id="lateDays">2 hari</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-100">Tidak Hadir</span>
+                            <span class="text-red-300 font-bold" id="absentDays">1 hari</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2 mt-4">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 88%"></div>
+                        </div>
+                        <div class="text-center text-white text-sm">Tingkat Kehadiran: 88%</div>
+                    </div>
+                </div>
+
+                <!-- Fitur Keamanan -->
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <span class="mr-3">🔒</span>
+                        Fitur Keamanan
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span class="text-blue-100 text-sm">GPS Location Tracking</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span class="text-blue-100 text-sm">IP Address Validation</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span class="text-blue-100 text-sm">Time Stamp Encryption</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span class="text-blue-100 text-sm">Photo Verification</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <span class="text-blue-100 text-sm">Device Fingerprinting</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jadwal Mengajar -->
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <span class="mr-3">🕐</span>
+                        Jadwal Hari Ini
+                    </h3>
+                    <div class="space-y-3" id="todaySchedule">
+                        <!-- Akan diisi dengan JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl p-6 m-4 max-w-md w-full">
+            <h3 class="text-xl font-bold text-white mb-4">Konfirmasi Absensi</h3>
+            <div id="confirmDetails" class="text-blue-100 mb-6"></div>
+            <div class="flex space-x-4">
+                <button onclick="confirmSubmission()" class="flex-1 bg-green-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-green-600 transition-colors">
+                    Ya, Submit
+                </button>
+                <button onclick="closeModal()" class="flex-1 bg-gray-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-gray-600 transition-colors">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sukses -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl p-6 m-4 max-w-md w-full text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h3 class="text-xl font-bold text-white mb-2">Absensi Berhasil!</h3>
+            <p class="text-blue-100 mb-6">Data absensi Anda telah tersimpan dengan aman</p>
+            <button onclick="closeSuccessModal()" class="bg-green-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-green-600 transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
